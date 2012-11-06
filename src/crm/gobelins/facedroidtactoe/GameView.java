@@ -64,12 +64,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		_thread.setPlayerPicture( player_pic_x, player_pic_o );
 	}
 	
-	public void setGrid(ArrayList<Player> board) {
-		_thread.setGrid(board);
-	}
-
-	public void setState(GameState state) {
-		_thread.setState(state);
+	public void setBoard(GameBoard board) {
+		_thread.setBoard(board);
 	}
 
 	@Override
@@ -106,9 +102,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		public void handleMessage(Message msg) {
 			Log.d("GOBELINS", msg.toString());
 		}
-	}
-
-	public void setWinCells(ArrayList<Integer> winner_cells) {
 	}
 
 }

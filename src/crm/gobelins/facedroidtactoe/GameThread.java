@@ -1,14 +1,11 @@
 package crm.gobelins.facedroidtactoe;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Handler;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
@@ -25,8 +22,7 @@ public class GameThread extends Thread {
 	private int _canvas_height = 1;
 	private int _canvas_width = 1;
 	private Boolean _is_running = false;
-	private ArrayList<Player> _board;
-	private GameState _state;
+	private GameBoard _board;
 
 	public GameThread(SurfaceHolder surfaceHolder, Context context,
 			Handler handler) {
@@ -64,14 +60,7 @@ public class GameThread extends Thread {
 		_is_running = b;
 	}
 
-	public void setState(GameState state) {
-		synchronized (_surface_holder) {
-			_state = state;
-			Log.d("GOBELINS", "set state ::: " + state);
-		}
-	}
-
-	public void setGrid(ArrayList<Player> board) {
+	public void setBoard(GameBoard board) {
 		synchronized (_surface_holder) {
 			_board = board;
 		}
@@ -108,8 +97,8 @@ public class GameThread extends Thread {
 		Float top;
 		Player cell;
 
-		for (int i = 0; i < _board.size(); i++) {
-			
+		for (int i = 0; i < _board.grid.size(); i++) {
+
 			top = (float) GameConsts.TOP * _canvas_height;
 			top += (float) ((i % GameConsts.GAME_WIDTH)
 					* (GameConsts.HEIGHT * _canvas_height) / GameConsts.GAME_WIDTH);
@@ -118,7 +107,7 @@ public class GameThread extends Thread {
 			left += (float) (Math.floor(i / GameConsts.GAME_WIDTH)
 					* (GameConsts.WIDTH * _canvas_width) / GameConsts.GAME_WIDTH);
 
-			cell = _board.get(i);
+			cell = _board.grid.get(i);
 
 			switch (cell) {
 			case EMPTY:
@@ -133,4 +122,5 @@ public class GameThread extends Thread {
 		}
 
 	}
+
 }

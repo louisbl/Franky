@@ -1,105 +1,66 @@
 package crm.gobelins.facedroidtactoe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.util.Log;
 
 public class GameManager {
 
-	public Player current_player = null;
-	public GameMode mode = null;
-	public GameState state = null;
-	public Player winner = null;
-	public ArrayList<Integer> winner_cells = new ArrayList<Integer>(
-			GameConsts.GAME_WIDTH * GameConsts.GAME_WIDTH);
-	public int num_cell_full = 0;
-
 	private ArrayList<ArrayList<Player>> _history = new ArrayList<ArrayList<Player>>();
+	private GameAI _ai = new GameAI();
 
-	public GameManager(GameMode m) {
-		mode = m;
-	}
-
-	public void resetGame(ArrayList<Player> board) {
+	public void resetGame(GameBoard board) {
 		_history.clear();
-		winner = null;
-		num_cell_full = 0;
-
-		winner_cells.clear();
-
-		for (int i = 0; i < GameConsts.GAME_WIDTH * GameConsts.GAME_WIDTH; i++) {
-			board.add(Player.EMPTY);
-		}
-
-		if (Math.random() > .5) {
-			current_player = Player.PLAYER_O;
-			state = GameState.PLAYER_O_TURN;
-		} else {
-			current_player = Player.PLAYER_X;
-			state = GameState.PLAYER_X_TURN;
-		}
-
-		nextPlayer();
+		board = new GameBoard(board.mode);
+		nextPlayer(board);
 	}
 
-	public boolean play(ArrayList<Player> board, int xx, int yy) {
-		return play(board, current_player, _convertToId(xx, yy));
+	public boolean play(GameBoard board, int xx, int yy) {
+		return play(board, board.current_player, _convertToId(xx, yy));
 	}
 
-	public boolean play(ArrayList<Player> board, int id) {
-		return play(board, current_player, id);
+	public boolean play(GameBoard board, int id) {
+		return play(board, board.current_player, id);
 	}
 
-	public boolean play(ArrayList<Player> board, Player player, int id) {
-		if (current_player != player)
+	public boolean play(GameBoard board, Player player, int id) {
+		if (board.current_player != player)
 			return false;
 
-		if (!_isEmpty(board, id))
+		if (!board.available.contains(id))
 			return false;
 
-		_setTileValue(board, id);
-		num_cell_full++;
+		_setTileValue(board.grid, board.current_player, id);
+		board.available.remove((Object) id);
 
-		_history.add((ArrayList<Player>) board.clone());
+		if (board.mode != GameMode.AI)
+			_history.add(new ArrayList<Player>(board.grid));
 
-		state = state == GameState.PLAYER_O_TURN ? GameState.PLAYER_X_TURN : GameState.PLAYER_O_TURN;
+		board.state = board.state == GameState.PLAYER_O_TURN ? GameState.PLAYER_X_TURN
+				: GameState.PLAYER_O_TURN;
 
 		_setEndGame(board);
 
-		current_player = current_player == Player.PLAYER_O ? Player.PLAYER_X
+		board.current_player = board.current_player == Player.PLAYER_O ? Player.PLAYER_X
 				: Player.PLAYER_O;
 
-		
 		return true;
 	}
 
-	public boolean getIsEnd() {
-		return (state == GameState.DRAW || state == GameState.WIN);
-	}
-
-	public void nextPlayer() {
-		if (mode == GameMode.DUO) {
+	public void nextPlayer(GameBoard board) {
+		if (board.mode == GameMode.DUO) {
 			_waitForOther();
-		} else {
-			if (current_player == Player.PLAYER_O)
-				_callAI();
+		} else if (board.mode == GameMode.SOLO) {
+			if (board.current_player == Player.PLAYER_O)
+				_callAI(board);
 		}
 	}
 
 	private void _waitForOther() {
 	}
 
-	private boolean _isEmpty(ArrayList<Player> board, int id) {
-		boolean empty = true;
-		try {
-			empty = board.get(id) == Player.EMPTY;
-		} catch (Exception e) {
-			Log.wtf("GOBELINS", e);
-		}
-		return empty;
-	}
-
-	private void _setEndGame(ArrayList<Player> board) {
+	private void _setEndGame(GameBoard board) {
 		boolean win_row = true;
 		boolean win_col = true;
 		boolean win_diag_top = true;
@@ -107,51 +68,52 @@ public class GameManager {
 
 		for (int i = 0; i < GameConsts.GAME_WIDTH; i++) {
 			for (int j = 0; j < GameConsts.GAME_WIDTH; j++) {
-				win_row &= _compareCell(board, _convertToId(i, j),
+				win_row &= _compareCell(board.grid, _convertToId(i, j),
 						_convertToId(i, 0));
-				win_col &= _compareCell(board, _convertToId(j, i),
+				win_col &= _compareCell(board.grid, _convertToId(j, i),
 						_convertToId(0, i));
 			}
 
 			if (win_row) {
-				state = GameState.WIN;
-				winner = board.get(_convertToId(i, 0));
+				board.state = GameState.WIN;
+				board.winner = board.grid.get(_convertToId(i, 0));
 				for (int k = 0; k < GameConsts.GAME_WIDTH; k++) {
-					winner_cells.add(k, _convertToId(i, k));
+					board.winner_cells.add(k, _convertToId(i, k));
 				}
 				return;
 			}
 
 			if (win_col) {
-				state = GameState.WIN;
-				winner = board.get(_convertToId(0, i));
+				board.state = GameState.WIN;
+				board.winner = board.grid.get(_convertToId(0, i));
 				for (int k = 0; k < GameConsts.GAME_WIDTH; k++) {
-					winner_cells.add(k, _convertToId(k, i));
+					board.winner_cells.add(k, _convertToId(k, i));
 				}
 				return;
 			}
 
-			win_diag_top &= _compareCell(board, _convertToId(i, i),
+			win_diag_top &= _compareCell(board.grid, _convertToId(i, i),
 					_convertToId(0, 0));
-			win_diag_bottom &= _compareCell(board,
+			win_diag_bottom &= _compareCell(board.grid,
 					_convertToId(GameConsts.GAME_WIDTH - i - 1, i),
 					_convertToId(GameConsts.GAME_WIDTH - 1, 0));
 		}
 
 		if (win_diag_top) {
-			winner = board.get(_convertToId(0, 0));
-			state = GameState.WIN;
+			board.winner = board.grid.get(_convertToId(0, 0));
+			board.state = GameState.WIN;
 			for (int k = 0; k < GameConsts.GAME_WIDTH; k++) {
-				winner_cells.add(k, _convertToId(k, k));
+				board.winner_cells.add(k, _convertToId(k, k));
 			}
 			return;
 		}
 
 		if (win_diag_bottom) {
-			winner = board.get(_convertToId(0, GameConsts.GAME_WIDTH - 1));
-			state = GameState.WIN;
+			board.winner = board.grid.get(_convertToId(0,
+					GameConsts.GAME_WIDTH - 1));
+			board.state = GameState.WIN;
 			for (int k = 0; k < GameConsts.GAME_WIDTH; k++) {
-				winner_cells.add(
+				board.winner_cells.add(
 						k,
 						_convertToId(GameConsts.GAME_WIDTH - 1 - k,
 								GameConsts.GAME_WIDTH - 1 - k));
@@ -159,37 +121,35 @@ public class GameManager {
 			return;
 		}
 
-		if (num_cell_full == GameConsts.GAME_WIDTH * GameConsts.GAME_WIDTH) {
-			state = GameState.DRAW;
+		if (board.available.size() == 0) {
+			board.state = GameState.DRAW;
 			return;
 		}
 
 	}
 
-	private boolean _compareCell(ArrayList<Player> board, int cell1, int cell2) {
-		if (board.get(cell1) == Player.EMPTY)
+	private boolean _compareCell(List<Player> grid, int cell1, int cell2) {
+		if (grid.get(cell1) == Player.EMPTY)
 			return false;
-		if (board.get(cell2) == Player.EMPTY)
+		if (grid.get(cell2) == Player.EMPTY)
 			return false;
 
-		return board.get(cell1) == board.get(cell2);
+		return grid.get(cell1) == grid.get(cell2);
 	}
 
-	private void _callAI() {
-
+	private void _callAI(GameBoard board) {
+		int id = _ai.computeNexteMove(this, board);
+		play(board, id);
 	}
 
 	private int _convertToId(int row, int col) {
 		return row * GameConsts.GAME_WIDTH + col;
 	}
 
-	private void _setTileValue(ArrayList<Player> board, int id) {
+	private void _setTileValue(List<Player> grid, Player player, int id) {
 		Log.d("GOBELINS", " id ::: " + id);
-		board.set(id, current_player);
-	}
+		grid.set(id, player);
 
-	public ArrayList<Integer> getAvailableCell(ArrayList<Player> board) {
-		return null;
 	}
 
 }
