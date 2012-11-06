@@ -26,13 +26,14 @@ public class GameBoard {
 			available.add(i);
 		}
 
-/*		if (Math.random() > .5) {
+		if (Math.random() > .5) {
 			current_player = Player.PLAYER_O;
 			state = GameState.PLAYER_O_TURN;
 		} else {
 			current_player = Player.PLAYER_X;
 			state = GameState.PLAYER_X_TURN;
-		}*/
+		}
+		
 		current_player = Player.PLAYER_X;
 		state = GameState.PLAYER_X_TURN;
 	}

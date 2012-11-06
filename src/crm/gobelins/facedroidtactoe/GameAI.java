@@ -18,7 +18,7 @@ public class GameAI {
 	private int _negaMaxAB(GameManager gm, GameBoard board, int alpha,
 			int beta, int horizon) {
 
-		if (horizon == 0) {
+		if (board.state == GameState.DRAW || board.state == GameState.WIN || horizon == 0) {
 			return _eval(board);
 		}
 
@@ -48,7 +48,7 @@ public class GameAI {
 	}
 
 	private int _eval(GameBoard board) {
-		// TODO Auto-generated method stub
+		
 		/*
 		 * For each row, if there are both X and O, then the score for the row
 		 * is 0. If the whole row is empty, then the score is 1. If there is

@@ -1,7 +1,5 @@
 package crm.gobelins.facedroidtactoe;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -45,6 +43,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		Log.d("GOBELINS"," destroyed ::: ");
 		boolean retry = true;
 		_thread.setRunning(false);
 		while (retry) {
@@ -60,10 +59,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		return _thread;
 	}
 
-	public void setPlayerPicture( Bitmap player_pic_x, Bitmap player_pic_o ){
-		_thread.setPlayerPicture( player_pic_x, player_pic_o );
+	public void setPlayerPicture(Bitmap player_pic_x, Bitmap player_pic_o) {
+		_thread.setPlayerPicture(player_pic_x, player_pic_o);
 	}
-	
+
 	public void setBoard(GameBoard board) {
 		_thread.setBoard(board);
 	}
@@ -73,11 +72,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		if (event.getX() < GameConsts.LEFT * _width
 				|| event.getX() > GameConsts.RIGHT * _width)
 			return false;
-		
+
 		if (event.getY() < GameConsts.TOP * _height
 				|| event.getY() > GameConsts.BOTTOM * _height)
 			return false;
-		
+
 		if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 
 			int xx = (int) (event.getX() - GameConsts.LEFT * _width);
@@ -89,7 +88,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			if (_cellHandler != null)
 				_cellHandler.onHandle(xx, yy);
 		}
-		
+
 		return true;
 	}
 

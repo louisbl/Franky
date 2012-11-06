@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
@@ -14,6 +15,8 @@ public class GameThread extends Thread {
 	private Handler _handler;
 	private Context _context;
 	private Bitmap _background_image;
+	private Bitmap _background_image_win;
+	private Bitmap _background_image_loose;
 	private Bitmap _player_pic_x;
 	private Bitmap _player_pic_o;
 	private Bitmap _src_player_pic_x;
@@ -23,6 +26,13 @@ public class GameThread extends Thread {
 	private int _canvas_width = 1;
 	private Boolean _is_running = false;
 	private GameBoard _board;
+	private float _top;
+	private float _left;
+	private float _top_size;
+	private float _left_size;
+	private float _left_tmp;
+	private float _top_tmp;
+	private Player cell;
 
 	public GameThread(SurfaceHolder surfaceHolder, Context context,
 			Handler handler) {
@@ -33,16 +43,26 @@ public class GameThread extends Thread {
 
 		_background_image = BitmapFactory
 				.decodeResource(res, R.drawable.franky);
+		_background_image_loose = BitmapFactory.decodeResource(res,
+				R.drawable.bg_looser);
+		_background_image_win = BitmapFactory.decodeResource(res,
+				R.drawable.bg_win);
 
 	}
 
 	public void setSurfaceSize(int width, int height) {
+		Log.d("GOBELINS",
+				" ----------------------- set surface size --------------------------");
 		synchronized (_surface_holder) {
 			_canvas_width = width;
 			_canvas_height = height;
 
 			_background_image = Bitmap.createScaledBitmap(_background_image,
 					width, height, true);
+			_background_image_loose = Bitmap.createScaledBitmap(
+					_background_image_loose, width, height, true);
+			_background_image_win = Bitmap.createScaledBitmap(
+					_background_image_win, width, height, true);
 			_player_pic_x = Bitmap.createScaledBitmap(_src_player_pic_x,
 					(int) (_canvas_width * GameConsts.WIDTH)
 							/ GameConsts.GAME_WIDTH,
@@ -53,6 +73,13 @@ public class GameThread extends Thread {
 							/ GameConsts.GAME_WIDTH,
 					(int) (_canvas_height * GameConsts.HEIGHT)
 							/ GameConsts.GAME_WIDTH, true);
+
+			_top = GameConsts.TOP * _canvas_height;
+			_left = GameConsts.LEFT * _canvas_width;
+			_top_size = (GameConsts.HEIGHT * _canvas_height)
+					/ GameConsts.GAME_WIDTH;
+			_left_size = (GameConsts.WIDTH * _canvas_width)
+					/ GameConsts.GAME_WIDTH;
 		}
 	}
 
@@ -88,24 +115,32 @@ public class GameThread extends Thread {
 					_surface_holder.unlockCanvasAndPost(c);
 			}
 		}
-
 	}
 
 	private void _doDraw(Canvas c) {
-		c.drawBitmap(_background_image, 0, 0, null);
-		Float left;
-		Float top;
-		Player cell;
+		switch (_board.state) {
+		case DRAW:
+			c.drawBitmap(_background_image_loose, 0, 0, null);
+			break;
+		case WIN:
+			if (_board.winner == Player.PLAYER_X)
+				c.drawBitmap(_background_image_win, 0, 0, null);
+			else
+				c.drawBitmap(_background_image_loose, 0, 0, null);
+			break;
+		default:
+			c.drawBitmap(_background_image, 0, 0, null);
+			break;
+		}
+
 
 		for (int i = 0; i < _board.grid.size(); i++) {
 
-			top = (float) GameConsts.TOP * _canvas_height;
-			top += (float) ((i % GameConsts.GAME_WIDTH)
-					* (GameConsts.HEIGHT * _canvas_height) / GameConsts.GAME_WIDTH);
+			_top_tmp = _top;
+			_top_tmp += (i % GameConsts.GAME_WIDTH) * _top_size;
 
-			left = (float) GameConsts.LEFT * _canvas_width;
-			left += (float) (Math.floor(i / GameConsts.GAME_WIDTH)
-					* (GameConsts.WIDTH * _canvas_width) / GameConsts.GAME_WIDTH);
+			_left_tmp = _left;
+			_left_tmp += (i / GameConsts.GAME_WIDTH) * _left_size;
 
 			cell = _board.grid.get(i);
 
@@ -113,10 +148,10 @@ public class GameThread extends Thread {
 			case EMPTY:
 				break;
 			case PLAYER_O:
-				c.drawBitmap(_player_pic_o, left, top, null);
+				c.drawBitmap(_player_pic_o, _left_tmp, _top_tmp, null);
 				break;
 			case PLAYER_X:
-				c.drawBitmap(_player_pic_x, left, top, null);
+				c.drawBitmap(_player_pic_x, _left_tmp, _top_tmp, null);
 				break;
 			}
 		}

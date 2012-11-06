@@ -25,6 +25,10 @@ public class GameManager {
 	}
 
 	public boolean play(GameBoard board, Player player, int id) {
+		
+		if (board.state == GameState.DRAW || board.state == GameState.WIN )
+			return false;
+		
 		if (board.current_player != player)
 			return false;
 
@@ -44,8 +48,10 @@ public class GameManager {
 
 		board.current_player = board.current_player == Player.PLAYER_O ? Player.PLAYER_X
 				: Player.PLAYER_O;
-
-		return true;
+		if( board.state == GameState.DRAW || board.state == GameState.WIN )
+			return false;
+		else
+			return true;
 	}
 
 	public void nextPlayer(GameBoard board) {
@@ -58,15 +64,19 @@ public class GameManager {
 	}
 
 	private void _waitForOther() {
+		
 	}
 
 	private void _setEndGame(GameBoard board) {
-		boolean win_row = true;
-		boolean win_col = true;
+		boolean win_row;
+		boolean win_col;
+		
 		boolean win_diag_top = true;
 		boolean win_diag_bottom = true;
 
 		for (int i = 0; i < GameConsts.GAME_WIDTH; i++) {
+			win_row = true;
+			win_col = true;
 			for (int j = 0; j < GameConsts.GAME_WIDTH; j++) {
 				win_row &= _compareCell(board.grid, _convertToId(i, j),
 						_convertToId(i, 0));
