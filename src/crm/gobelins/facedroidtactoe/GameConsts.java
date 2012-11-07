@@ -1,5 +1,7 @@
 package crm.gobelins.facedroidtactoe;
 
+import java.util.UUID;
+
 public class GameConsts {
 
 	public static final int GAME_WIDTH = 3;
@@ -9,4 +11,6 @@ public class GameConsts {
 	public static final float BOTTOM = (float) 0.5;
 	public static final float WIDTH = (float) 0.7;
 	public static final float HEIGHT = (float) 0.25;
+	public static final String NOM = null;
+	public static final UUID MON_UUID = null;
 }

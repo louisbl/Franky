@@ -33,7 +33,7 @@ public class GameBoard {
 			current_player = Player.PLAYER_X;
 			state = GameState.PLAYER_X_TURN;
 		}
-		
+
 		current_player = Player.PLAYER_X;
 		state = GameState.PLAYER_X_TURN;
 	}

@@ -15,8 +15,6 @@ public class GameThread extends Thread {
 	private Handler _handler;
 	private Context _context;
 	private Bitmap _background_image;
-	private Bitmap _background_image_win;
-	private Bitmap _background_image_loose;
 	private Bitmap _player_pic_x;
 	private Bitmap _player_pic_o;
 	private Bitmap _src_player_pic_x;
@@ -39,30 +37,20 @@ public class GameThread extends Thread {
 		_surface_holder = surfaceHolder;
 		_handler = handler;
 		_context = context;
-		Resources res = context.getResources();
+		Resources res = _context.getResources();
 
 		_background_image = BitmapFactory
 				.decodeResource(res, R.drawable.franky);
-		_background_image_loose = BitmapFactory.decodeResource(res,
-				R.drawable.bg_looser);
-		_background_image_win = BitmapFactory.decodeResource(res,
-				R.drawable.bg_win);
 
 	}
 
 	public void setSurfaceSize(int width, int height) {
-		Log.d("GOBELINS",
-				" ----------------------- set surface size --------------------------");
 		synchronized (_surface_holder) {
 			_canvas_width = width;
 			_canvas_height = height;
 
 			_background_image = Bitmap.createScaledBitmap(_background_image,
 					width, height, true);
-			_background_image_loose = Bitmap.createScaledBitmap(
-					_background_image_loose, width, height, true);
-			_background_image_win = Bitmap.createScaledBitmap(
-					_background_image_win, width, height, true);
 			_player_pic_x = Bitmap.createScaledBitmap(_src_player_pic_x,
 					(int) (_canvas_width * GameConsts.WIDTH)
 							/ GameConsts.GAME_WIDTH,
@@ -93,6 +81,24 @@ public class GameThread extends Thread {
 		}
 	}
 
+	public void setBgDraw() {
+		synchronized (_surface_holder) {
+			_background_image = BitmapFactory.decodeResource(
+					_context.getResources(), R.drawable.bg_looser);
+			_background_image = Bitmap.createScaledBitmap(_background_image,
+					_canvas_width, _canvas_height, true);
+		}
+	}
+
+	public void setBgWin() {
+		synchronized (_surface_holder) {
+			_background_image = BitmapFactory.decodeResource(
+					_context.getResources(), R.drawable.bg_win);
+			_background_image = Bitmap.createScaledBitmap(_background_image,
+					_canvas_width, _canvas_height, true);
+		}
+	}
+
 	public void setPlayerPicture(Bitmap player_pic_x, Bitmap player_pic_o) {
 		synchronized (_surface_holder) {
 			_src_player_pic_o = player_pic_o;
@@ -118,22 +124,7 @@ public class GameThread extends Thread {
 	}
 
 	private void _doDraw(Canvas c) {
-		switch (_board.state) {
-		case DRAW:
-			c.drawBitmap(_background_image_loose, 0, 0, null);
-			break;
-		case WIN:
-			if (_board.winner == Player.PLAYER_X)
-				c.drawBitmap(_background_image_win, 0, 0, null);
-			else
-				c.drawBitmap(_background_image_loose, 0, 0, null);
-			break;
-		default:
-			c.drawBitmap(_background_image, 0, 0, null);
-			break;
-		}
-
-
+		c.drawBitmap(_background_image, 0, 0, null);
 		for (int i = 0; i < _board.grid.size(); i++) {
 
 			_top_tmp = _top;

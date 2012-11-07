@@ -43,7 +43,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d("GOBELINS"," destroyed ::: ");
+		Log.d("GOBELINS", " destroyed ::: ");
 		boolean retry = true;
 		_thread.setRunning(false);
 		while (retry) {
@@ -57,6 +57,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public GameThread getThread() {
 		return _thread;
+	}
+	
+	public void setBgDraw() {
+		_thread.setBgDraw();
+	}
+	
+	public void setBgWin() {
+		_thread.setBgWin();
 	}
 
 	public void setPlayerPicture(Bitmap player_pic_x, Bitmap player_pic_o) {

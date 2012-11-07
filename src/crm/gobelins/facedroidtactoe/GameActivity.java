@@ -20,6 +20,17 @@ public class GameActivity extends Activity {
 			// Log.d("GOBELINS", " xx ::: " + xx + " yy ::: " + yy);
 			if (_game_manager.play(_board, xx, yy)) {
 				_game_manager.nextPlayer(_board);
+			} else {
+				switch (_board.state) {
+				case DRAW:
+					_game_view.setBgDraw();
+					break;
+				case WIN:
+					_game_view.setBgWin();
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	};
@@ -36,7 +47,7 @@ public class GameActivity extends Activity {
 				Intent enableBtIntent = new Intent(
 						BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}else{
+			} else {
 				_hayBt();
 			}
 		} else {
@@ -45,8 +56,8 @@ public class GameActivity extends Activity {
 	}
 
 	private void _hayBt() {
-		Toast.makeText(GameActivity.this, "Bluetooth, mode deux joueur !",
-				Toast.LENGTH_LONG).show();
+		Toast.makeText(GameActivity.this, "Bluetooth !", Toast.LENGTH_LONG)
+				.show();
 		_startGame(GameMode.DUO);
 	}
 
