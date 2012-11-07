@@ -34,10 +34,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		_width = width;
 		_height = height;
 		_thread.setSurfaceSize(width, height);
+		
+		if (_cellHandler != null)
+			_cellHandler.onReady();
+		
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d("GOBELINS", "surface created");
+		
 		_thread.setRunning(true);
 		_thread.start();
 	}
@@ -59,8 +64,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		return _thread;
 	}
 	
-	public void setBgDraw() {
-		_thread.setBgDraw();
+	public void setBgLoose() {
+		_thread.setBgLoose();
 	}
 	
 	public void setBgWin() {
@@ -87,14 +92,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 
-			int xx = (int) (event.getX() - GameConsts.LEFT * _width);
-			xx /= (int) (_width * GameConsts.WIDTH) / GameConsts.GAME_WIDTH;
+			int col = (int) (event.getX() - GameConsts.LEFT * _width);
+			col /= (int) (_width * GameConsts.WIDTH) / GameConsts.GAME_WIDTH;
 
-			int yy = (int) (event.getY() - GameConsts.TOP * _height);
-			yy /= (int) (_height * GameConsts.HEIGHT) / GameConsts.GAME_WIDTH;
+			int row = (int) (event.getY() - GameConsts.TOP * _height);
+			row /= (int) (_height * GameConsts.HEIGHT) / GameConsts.GAME_WIDTH;
 
 			if (_cellHandler != null)
-				_cellHandler.onHandle(xx, yy);
+				_cellHandler.onHandle(col, row);
 		}
 
 		return true;
@@ -103,7 +108,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void setCellHandler(HandleCellInterface cellHandler) {
 		_cellHandler = cellHandler;
 	}
-
+	
 	static class MessageHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
@@ -111,8 +116,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-}
+	public void addOnCell(int last_played) {
+		_thread.addOnCell(last_played);
+	}
 
-interface HandleCellInterface {
-	void onHandle(int xx, int yy);
 }

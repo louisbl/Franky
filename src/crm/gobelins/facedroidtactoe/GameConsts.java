@@ -13,4 +13,5 @@ public class GameConsts {
 	public static final float HEIGHT = (float) 0.25;
 	public static final String NOM = null;
 	public static final UUID MON_UUID = null;
+	public static final int NUM_PARTICLES = 10;
 }
