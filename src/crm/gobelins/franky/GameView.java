@@ -1,4 +1,4 @@
-package crm.gobelins.facedroidtactoe;
+package crm.gobelins.franky;
 
 import android.content.Context;
 import android.graphics.Bitmap;

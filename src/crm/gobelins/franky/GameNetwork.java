@@ -1,4 +1,4 @@
-package crm.gobelins.facedroidtactoe;
+package crm.gobelins.franky;
 
 import java.io.IOException;
 
@@ -18,13 +18,13 @@ class ServeurBluetooth extends Thread {
 	private final BluetoothServerSocket blueServerSocket;
 
 	public ServeurBluetooth() {
-		// On utilise un objet temporaire qui sera assigné plus tard à
+		// On utilise un objet temporaire qui sera assignï¿½ plus tard ï¿½
 		// blueServerSocket car blueServerSocket est "final"
 		BluetoothServerSocket tmp = null;
 		BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
 		try {
 			// MON_UUID est l'UUID (comprenez identifiant serveur) de
-			// l'application. Cette valeur est nécessaire côté client également
+			// l'application. Cette valeur est nï¿½cessaire cï¿½tï¿½ client ï¿½galement
 			// !
 			if (blueAdapter != null) {
 				tmp = blueAdapter.listenUsingRfcommWithServiceRecord(
@@ -44,10 +44,10 @@ class ServeurBluetooth extends Thread {
 			} catch (IOException e) {
 				break;
 			}
-			// Si une connexion est acceptée
+			// Si une connexion est acceptï¿½e
 			if (blueSocket != null) {
 				// On fait ce qu'on veut de la connexion (dans un thread
-				// séparé), à vous de la créer
+				// sï¿½parï¿½), ï¿½ vous de la crï¿½er
 				manageConnectedSocket(blueSocket);
 				try {
 					blueServerSocket.close();
@@ -65,7 +65,7 @@ class ServeurBluetooth extends Thread {
 
 	}
 
-	// On stoppe l'écoute des connexions et on tue le thread
+	// On stoppe l'ï¿½coute des connexions et on tue le thread
 	public void cancel() {
 		try {
 			blueServerSocket.close();
@@ -84,10 +84,10 @@ class ClientBluetooth extends Thread {
 		BluetoothSocket tmp = null;
 		blueDevice = device;
 
-		// On récupère un objet BluetoothSocket grâce à l'objet BluetoothDevice
+		// On rï¿½cupï¿½re un objet BluetoothSocket grï¿½ce ï¿½ l'objet BluetoothDevice
 		try {
 			// MON_UUID est l'UUID (comprenez identifiant serveur) de
-			// l'application. Cette valeur est nécessaire côté serveur également
+			// l'application. Cette valeur est nï¿½cessaire cï¿½tï¿½ serveur ï¿½galement
 			// !
 			tmp = device.createRfcommSocketToServiceRecord(GameConsts.MON_UUID);
 		} catch (IOException e) {
@@ -96,14 +96,14 @@ class ClientBluetooth extends Thread {
 	}
 
 	public void run() {
-		// On annule la découverte des périphériques (inutile puisqu'on est en
+		// On annule la dï¿½couverte des pï¿½riphï¿½riques (inutile puisqu'on est en
 		// train d'essayer de se connecter)
 		BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
 		blueAdapter.cancelDiscovery();
 
 		try {
-			// On se connecte. Cet appel est bloquant jusqu'à la réussite ou la
-			// levée d'une erreur
+			// On se connecte. Cet appel est bloquant jusqu'ï¿½ la rï¿½ussite ou la
+			// levï¿½e d'une erreur
 			blueSocket.connect();
 		} catch (IOException connectException) {
 			// Impossible de se connecter, on ferme la socket et on tue le
@@ -115,7 +115,7 @@ class ClientBluetooth extends Thread {
 			return;
 		}
 
-		// Utilisez la connexion (dans un thread séparé) pour faire ce que vous
+		// Utilisez la connexion (dans un thread sï¿½parï¿½) pour faire ce que vous
 		// voulez
 		manageConnectedSocket(blueSocket);
 	}

@@ -1,4 +1,4 @@
-package crm.gobelins.facedroidtactoe;
+package crm.gobelins.franky;
 
 import java.util.ArrayList;
 import java.util.List;
